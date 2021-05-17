@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="auth-v2.xml" />
+
+    <bean id="url" class="java.lang.String">
+        <constructor-arg value="http://app.bernco.gov/custodylist/" />
+    </bean>
+
+    <bean id="nia" class="java.util.ArrayList" scope="prototype">
+        <constructor-arg>
+            <list value-type="java.lang.String">
+                <value></value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="suspectListDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="root" value="#GridView1 tr:gt(0)" />
+                <entry key="td:eq(0)" value="name" />
+                <entry key="td:eq(1)" value="inmateId" />
+                <entry key="td:eq(2)" value="arrestNumber" />
+                <entry key="td:eq(3)" value="yearOfBirth" />
+                <entry key="td:eq(4)" value="location" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="arrestDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="body" />
+                <entry key="#ViewOffImageDate"   value="originalBookDateTime" />
+                <entry key="#DataList1 table table td:eq(1)" value="inmateId" />
+                <entry key="#DataList1 table table tr:eq(2) span" value="arrestNumber" />
+                <entry key="span#ViewOffImageDate" value="bookingDate" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="suspectDetailsDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="#DataList1 table table" />
+                <entry key="tr:eq(0) span" value="name" />
+                <entry key="tr:eq(1) span" value="inmateId" />
+                <entry key="tr:eq(2) span" value="arrestNumber" />
+                <entry key="tr:eq(3) span" value="yearOfBirth" />
+                <entry key="tr:eq(4) span" value="location" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="chargeDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="#DataList2 table table" />
+                <entry key="tr:eq(0) span" value="caseNumber" />
+                <entry key="tr:eq(2) span" value="arrestDate" />
+                <entry key="tr:eq(3) span" value="arrestTime" />
+                <entry key="tr:eq(5) span" value="arrestCode" />
+                <entry key="tr:eq(6) span" value="chargeDescription" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="chargeAltDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="#GridView3_Panel table table table" />
+                <entry key="tr:eq(0) span" value="caseNumber" />
+                <entry key="tr:eq(1) span" value="confirm" />
+                <entry key="tr:eq(2) span" value="bookingDate" />
+                <entry key="tr:eq(3) span" value="arrestTime" />
+                <entry key="tr:eq(5) span" value="chargeComment" />
+                <entry key="tr:eq(6) span" value="chargeDescription" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="caseDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="#DataList4 table table" />
+                <entry key="tr:eq(0) span" value="caseNumber" />
+                <entry key="tr:eq(1) span" value="bondAmount" />
+                <entry key="tr:eq(2) span" value="status" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="warrantDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map>
+                <entry key="root" value="#GridView3_Panel table table table" />
+                <entry key="tr:eq(0) span" value="caseNumber" />
+                <entry key="tr:eq(1) span" value="confirm" />
+                <entry key="tr:eq(2) span" value="bookingDate" />
+                <entry key="tr:eq(3) span" value="arrestTime" />
+                <entry key="tr:eq(5) span" value="warrantComment" />
+                <entry key="tr:eq(6) span" value="warrantDescription" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="arrestImageDataMap" class="java.util.HashMap" scope="prototype">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="selector" value="img" />
+                <entry key="attr" value="src" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="facilityDataMap" class="java.util.HashMap" scope="prototype" >
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="root" value="data" />
+                <entry key="facility" value="facility" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!--START-->
+    <bean id="getFacilityJsonState" class="local.demo.state_machine.state_machine.states.JsonContentState">
+        <constructor-arg index="0" value="PARSE_FACILITY" />
+        <constructor-arg index="1" value="{&quot;data&quot;:{&quot;facility&quot;:&quot;Bernadillo County, NM&quot;}}" />
+    </bean>
+
+    <!--PARSE_FACILITY-->
+    <bean id="parseFacilityDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="GET_VIEWSTATE" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="parseFacilityJsonState" class="local.demo.state_machine.state_machine.states.JsonParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseFacilityDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <map>
+                <entry key="root" value="data" />
+                <entry key="facility" value="facility" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <null />
+        </constructor-arg>
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Facility" />
+    </bean>
+
+    <!--GET_VIEWSTATE-->
+    <bean id="getWebFormsStateDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="CHOOSE_LIST_TYPE" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="getWebFormsState" class="local.demo.state_machine.state_machine.states.HtmlGetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="getWebFormsStateDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="Default.aspx" />
+        <constructor-arg index="2" value="html" />
+    </bean>
+
+    <!--PARSE_VIEWSTATE-->
+    <bean id="parseWebFormsState" class="local.demo.state_machine.state_machine.states.WebFormParserState">
+        <constructor-arg index="0" value="CHOOSE_LIST_TYPE" />
+    </bean>
+
+    <!--CHOOSE_LIST_TYPE-->
+    <bean id="getListTypeDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="UPDATE_VIEWSTATE" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="getListTypeState" class="local.demo.state_machine.state_machine.states.HtmlGetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="getListTypeDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="CustodyListInter.aspx" />
+        <constructor-arg index="2" value="html" />
+    </bean>
+
+    <!--UPDATE_VIEWSTATE-->
+    <bean id="updateWebFormsState" class="local.demo.state_machine.state_machine.states.WebFormParserState">
+        <constructor-arg index="0" value="SET_SUSPECT_LIST" />
+    </bean>
+
+    <!--SET_SUSPECT_LIST-->
+    <bean id="setSuspectListDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="GET_LIST" />
+    </bean>
+    <bean id="setSuspectListState" class="local.demo.state_machine.state_machine.states.SetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="setSuspectListDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1"><null/></constructor-arg>
+        <constructor-arg index="2"><null/></constructor-arg>
+        <constructor-arg index="3">
+            <map>
+                <entry key="DescList" value="ALL" />
+                <entry key="SubmitButton" value="Custody List" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="4"><null/></constructor-arg>
+        <constructor-arg index="5" value="true"/>
+    </bean>
+
+    <!--GET_LIST-->
+    <bean id="getSuspectListError" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="#context.getContent().contains('Select a List and Click the button below for the Custody List')"/>
+        <constructor-arg index="1" value="ERROR" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="getSuspectListDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true"/>
+        <constructor-arg index="1" value="PARSE_LIST" />
+        <constructor-arg index="2" value="1" />
+    </bean>
+    <bean id="getSuspectList" class="local.demo.state_machine.state_machine.states.HtmlPostRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="getSuspectListError" />
+                <ref bean="getSuspectListDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="CustodyListInter.aspx?submitted=true" />
+    </bean>
+
+    <!--PARSE_LIST-->
+    <bean id="parseSuspectListDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="CLEAN_PARAMS" />
+    </bean>
+    <bean id="parseSuspectListState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseSuspectListDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="suspectListDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="inmateId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Suspect" />
+    </bean>
+
+    <!--CLEAN_PARAMS-->
+    <bean id="cleanParametersState" class="local.demo.state_machine.state_machine.states.ClearRequestState">
+        <constructor-arg index="0" value="DETAILS_INIT" />
+        <constructor-arg index="1" value="false" />
+        <constructor-arg index="2" value="true" />
+        <constructor-arg index="3" value="false" />
+    </bean>
+
+    <!--DETAILS_INIT-->
+    <bean id="detailsInitDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="DETAILS_ITERATOR" />
+    </bean>
+    <bean id="detailsInitState" class="local.demo.state_machine.state_machine.states.SetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="detailsInitDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="ChargesInter.aspx"/>
+        <constructor-arg index="2"><null/></constructor-arg>
+        <constructor-arg index="3">
+            <map>
+                <entry key="id" value="0" />
+                <entry key="bo" value="0" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="4"><null/></constructor-arg>
+    </bean>
+
+    <!--DETAILS_ITERATOR-->
+    <bean id="detailsIteratorDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="FILTER_BOND" />
+        <constructor-arg index="2" value="1" />
+    </bean>
+    <bean id="detailsIteratorNext" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="#context.getContent() != null" />
+        <constructor-arg index="1" value="SET_DETAILS" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="detailsIterator" class="local.demo.state_machine.state_machine.iterators.PropertyIterator">
+        <constructor-arg index="0" value="inmateId" />
+    </bean>
+    <bean id="detailsIteratorState" class="local.demo.state_machine.state_machine.states.RequestIteratorState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="detailsIteratorNext" />
+                <ref bean="detailsIteratorDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg ref="detailsIterator" />
+        <constructor-arg value="id" />
+        <constructor-arg value="true" />
+    </bean>
+
+    <bean id="keySetIterator" class="local.demo.state_machine.state_machine.iterators.KeySetIterator" />
+    <bean id="detailsIteratorState2" class="local.demo.state_machine.state_machine.states.CurrentSuspectIdIteratorState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="detailsIteratorNext" />
+                <ref bean="detailsIteratorDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg ref="keySetIterator" />
+    </bean>
+
+    <!-- SET_DETAILS -->
+    <bean id="setDetailsRequestState" class="local.demo.state_machine.state_machine.states.SetRequestFromSuspectState">
+        <constructor-arg index="0" value="GET_DETAILS" />
+        <constructor-arg index="1"><null /></constructor-arg>
+        <constructor-arg index="2"><null /></constructor-arg>
+        <constructor-arg index="3">
+            <map>
+                <entry key="arrestNumber" value="bo" />
+                <entry key="inmateId" value="id" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="4"><null /></constructor-arg>
+    </bean>
+
+    <!--GET_DETAILS-->
+    <bean id="getSuspectDetailsDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="#context.getContent().contains('DataList1')" />
+        <constructor-arg index="1" value="PARSE_DETAILS" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="getSuspectDetailsError" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="DETAILS_INIT" />
+        <constructor-arg index="2" value="1" />
+    </bean>
+    <bean id="getSuspectDetailsState" class="local.demo.state_machine.state_machine.states.HtmlGetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="getSuspectDetailsDone" />
+                <ref bean="getSuspectDetailsError" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!--PARSE_DETAILS-->
+    <bean id="parseSuspectDetailsDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PARSE_ARREST" />
+    </bean>
+    <bean id="parseSuspectDetailsState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseSuspectDetailsDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="suspectDetailsDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="inmateId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Suspect" />
+        <constructor-arg index="4" value="true" />
+    </bean>
+
+    <!--PARSE_ARREST-->
+    <bean id="parseArrestDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PARSE_CHARGES" />
+    </bean>
+    <bean id="parseArrestState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseArrestDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="arrestDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="inmateId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Arrest" />
+    </bean>
+
+    <!--PARSE_CHARGES-->
+    <bean id="parseChargesDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PARSE_CASES" />
+        <constructor-arg index="2" value="1" />
+    </bean>
+<!--    <bean id="parseChargesEmpty" class="local.demo.state_machine.state_machine.transitions.StateTransition">-->
+<!--        <constructor-arg index="0" value="#context.getCharges().get(#context.getCurrentSuspectId()).size() == 0" />-->
+<!--        <constructor-arg index="1" value="PARSE_CHARGES_ALT" />-->
+<!--        <constructor-arg index="2" value="0" />-->
+<!--    </bean>-->
+    <bean id="parseChargesState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseChargesDone" />
+<!--                <ref bean="parseChargesEmpty" />-->
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="chargeDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="bookingId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Charge" />
+    </bean>
+
+    <!--PARSE_CHARGES_ALT-->
+    <bean id="parseChargesAltState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseChargesDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="chargeDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="bookingId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Charge" />
+    </bean>
+
+    <!--PARSE_CASES-->
+    <bean id="parseCasesDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PARSE_WARRANTS" />
+    </bean>
+    <bean id="parseCasesState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseCasesDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="caseDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="inmateId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Case" />
+    </bean>
+
+    <!--PARSE_WARRANTS-->
+    <bean id="parseWarrantsDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PARSE_IMAGE" />
+    </bean>
+    <bean id="parseWarrantsState" class="local.demo.state_machine.state_machine.states.HtmlParserState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseWarrantsDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="warrantDataMap" />
+        </constructor-arg>
+        <constructor-arg index="2" value="inmateId" />
+        <constructor-arg index="3" type="local.demo.state_machine.state_machine.ResultType" value="Warrant" />
+    </bean>
+
+    <!--PARSE_IMAGE-->
+    <bean id="parseSuspectImageDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg value="true" />
+        <constructor-arg value="GET_IMAGE" />
+        <constructor-arg value="1" />
+    </bean>
+    <bean id="parseSuspectImageState" class="local.demo.state_machine.state_machine.states.HtmlPropertyParserSetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="parseSuspectImageDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="arrestImageDataMap" />
+        </constructor-arg>
+    </bean>
+
+    <!--GET_IMAGE-->
+    <bean id="saveSuspectImageDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg value="true" />
+        <constructor-arg index="1" value="DETAILS_INIT" />
+        <constructor-arg value="2" />
+    </bean>
+    <bean id="saveSuspectImageState" class="local.demo.state_machine.state_machine.states.FileGetRequestState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="saveSuspectImageDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" value="images/" />
+        <constructor-arg index="2" value="true" />
+    </bean>
+
+    <!--FILTER_BOND-->
+    <bean id="bondFilterDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg index="0" value="true" />
+        <constructor-arg index="1" value="PUSH" />
+        <constructor-arg index="2" value="0" />
+    </bean>
+    <bean id="bondFilterState" class="local.demo.state_machine.state_machine.states.FilterPropertyState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="bondFilterDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <map>
+                <entry key="bondAmount">
+                    <bean class="local.demo.state_machine.state_machine.rules.RegexRule">
+                        <constructor-arg index="0" value="\$((\d{1,3}),)?((\d{1,3}),)?((\d{1,3}),)?((\d{1,3}))?" />
+                        <constructor-arg index="1" value="$2$4$6$8.00" />
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+        <constructor-arg index="2" type="local.demo.state_machine.state_machine.ResultType" value="Case" />
+    </bean>
+
+    <!--PUSH-->
+    <bean id="vc7apiPushStateDone" class="local.demo.state_machine.state_machine.transitions.StateTransition">
+        <constructor-arg value="true" />
+        <constructor-arg value="END" />
+        <constructor-arg value="0" />
+    </bean>
+    <bean id="vc7apiPushState" class="local.demo.state_machine.state_machine.states.PushToVC7ApiState">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="vc7apiPushStateDone" />
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <ref bean="pushUrl" />
+        </constructor-arg>
+        <constructor-arg index="2">
+            <ref bean="pushUsername" />
+        </constructor-arg>
+        <constructor-arg index="3">
+            <ref bean="pushPassword" />
+        </constructor-arg>
+        <constructor-arg index="4">
+            <ref bean="nia" />
+        </constructor-arg>
+        <constructor-arg index="5" ref="statsEndpoint" />
+        <constructor-arg index="6" ref="statsApiKey" />
+    </bean>
+
+    <!--ERROR-->
+    <bean id="errorState" class="local.demo.state_machine.state_machine.states.LogFatalErrorState" />
+
+    <!--END-->
+    <bean id="endState" class="local.demo.state_machine.state_machine.states.EndState" />
+
+    <bean id="context" class="local.demo.state_machine.state_machine.states.HtmlRequestContext">
+        <constructor-arg index="0">
+            <map>
+                <entry key="START"              value-ref="getFacilityJsonState" />
+                <entry key="PARSE_FACILITY"     value-ref="parseFacilityJsonState" />
+                <entry key="GET_VIEWSTATE"      value-ref="getWebFormsState" />
+                <entry key="PARSE_VIEWSTATE"    value-ref="parseWebFormsState" />
+                <entry key="CHOOSE_LIST_TYPE"   value-ref="getListTypeState" />
+                <entry key="UPDATE_VIEWSTATE"   value-ref="updateWebFormsState" />
+                <entry key="SET_SUSPECT_LIST"   value-ref="setSuspectListState" />
+                <entry key="GET_LIST"           value-ref="getSuspectList" />
+                <entry key="PARSE_LIST"         value-ref="parseSuspectListState" />
+                <entry key="CLEAN_PARAMS"       value-ref="cleanParametersState" />
+                <entry key="DETAILS_INIT"       value-ref="detailsInitState" />
+                <entry key="DETAILS_ITERATOR"   value-ref="detailsIteratorState2" />
+                <entry key="SET_DETAILS"        value-ref="setDetailsRequestState" />
+                <entry key="GET_DETAILS"        value-ref="getSuspectDetailsState" />
+                <entry key="PARSE_DETAILS"      value-ref="parseSuspectDetailsState" />
+                <entry key="PARSE_ARREST"       value-ref="parseArrestState" />
+                <entry key="PARSE_CHARGES"      value-ref="parseChargesState" />
+                <entry key="PARSE_CHARGES_ALT"  value-ref="parseChargesAltState" />
+                <entry key="PARSE_CASES"        value-ref="parseCasesState" />
+                <entry key="PARSE_WARRANTS"     value-ref="parseWarrantsState" />
+                <entry key="PARSE_IMAGE"        value-ref="parseSuspectImageState" />
+                <entry key="GET_IMAGE"          value-ref="saveSuspectImageState" />
+                <entry key="FILTER_BOND"        value-ref="bondFilterState" />
+                <entry key="PUSH"               value-ref="vc7apiPushState" />
+                <entry key="ERROR"              value-ref="errorState" />
+                <entry key="END"                value-ref="endState" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="1"  type="java.lang.String" value="START" />
+        <constructor-arg index="2" ref="url" />
+        <constructor-arg index="3">
+            <map key-type="java.lang.String" value-type="java.lang.String">
+                <entry key="User-Agent" value="BioBot/1.0 (compatible; https://biometrica.com/what-is-biobot)" />
+                <entry key="Accept" value="text/json,text/html,image/png,image/jpeg,image/jpg,image/gif,*/*" />
+                <entry key="Host" value="app.bernco.gov" />
+                <entry key="Referer" value="http://app.bernco.gov/custodylist/ChargesInter.aspx" />
+                <entry key="Origin" value="http://app.bernco.gov" />
+            </map>
+        </constructor-arg>
+        <constructor-arg index="4">
+            <map />
+        </constructor-arg>
+        <constructor-arg index="5">
+            <map />
+        </constructor-arg>
+    </bean>
+
+</beans>
